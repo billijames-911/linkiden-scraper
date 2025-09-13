@@ -33,28 +33,27 @@ class LinkedInScraper:
         self.driver = None
         
     def setup_browser(self):
-        """Setup undetected Chrome browser"""
+        """Setup undetected Chrome browser with advanced anti-detection"""
         try:
-            print("Setting up undetected Chrome driver...")
+            print("Setting up advanced undetected Chrome driver...")
             
-            # Randomize window size
+            # Randomize window size with more realistic options
             window_sizes = [
-                (1366, 768), (1920, 1080), (1440, 900), (1536, 864), 
-                (1280, 720), (1600, 900), (1024, 768), (1280, 1024)
+                (1920, 1080), (1366, 768), (1440, 900), (1536, 864), 
+                (1280, 720), (1600, 900), (1024, 768), (1280, 1024),
+                (1680, 1050), (1920, 1200), (2560, 1440), (3840, 2160)
             ]
             width, height = random.choice(window_sizes)
             
             # Create undetected Chrome driver
             options = uc.ChromeOptions()
             
-            # Basic options
+            # Advanced stealth options
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
             options.add_argument("--disable-gpu")
             options.add_argument(f"--window-size={width},{height}")
             options.add_argument("--start-maximized")
-            
-            # Additional stealth options
             options.add_argument("--disable-blink-features=AutomationControlled")
             options.add_argument("--disable-extensions")
             options.add_argument("--disable-plugins")
@@ -83,39 +82,78 @@ class LinkedInScraper:
             options.add_argument("--silent")
             options.add_argument("--log-level=3")
             
-            # Randomize user agent
+            # Advanced anti-detection arguments
+            options.add_argument("--disable-features=VizDisplayCompositor")
+            options.add_argument("--disable-software-rasterizer")
+            options.add_argument("--disable-background-mode")
+            options.add_argument("--disable-background-timer-throttling")
+            options.add_argument("--disable-renderer-backgrounding")
+            options.add_argument("--disable-backgrounding-occluded-windows")
+            options.add_argument("--disable-features=TranslateUI")
+            options.add_argument("--disable-ipc-flooding-protection")
+            options.add_argument("--disable-hang-monitor")
+            options.add_argument("--disable-prompt-on-repost")
+            options.add_argument("--disable-sync")
+            options.add_argument("--disable-default-apps")
+            options.add_argument("--disable-component-extensions-with-background-pages")
+            options.add_argument("--disable-background-networking")
+            options.add_argument("--disable-client-side-phishing-detection")
+            options.add_argument("--disable-sync-preferences")
+            options.add_argument("--disable-translate")
+            options.add_argument("--hide-scrollbars")
+            options.add_argument("--mute-audio")
+            options.add_argument("--no-first-run")
+            options.add_argument("--disable-logging")
+            options.add_argument("--disable-gpu-logging")
+            options.add_argument("--silent")
+            options.add_argument("--log-level=3")
+            
+            # Randomize user agent with more realistic options
             user_agents = [
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
                 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
             ]
             selected_ua = random.choice(user_agents)
             options.add_argument(f"--user-agent={selected_ua}")
             
-            # Randomize language
-            options.add_argument(f"--lang={random.choice(['en-US', 'en-GB', 'en-CA', 'en-AU'])}")
+            # Randomize language and locale
+            locales = ['en-US', 'en-GB', 'en-CA', 'en-AU', 'en-NZ', 'en-ZA']
+            selected_locale = random.choice(locales)
+            options.add_argument(f"--lang={selected_locale}")
             
             # Create undetected Chrome driver with version detection
             self.driver = uc.Chrome(options=options, version_main=135)
             
-            # Additional stealth measures
+            # Advanced stealth measures
             self.driver.execute_script("""
-                // Remove webdriver property
+                // Remove webdriver property completely
                 Object.defineProperty(navigator, 'webdriver', {
                     get: () => undefined,
                 });
                 
-                // Override plugins
+                // Remove automation indicators
+                delete window.cdc_adoQpoasnfa76pfcZLmcfl_Array;
+                delete window.cdc_adoQpoasnfa76pfcZLmcfl_Promise;
+                delete window.cdc_adoQpoasnfa76pfcZLmcfl_Symbol;
+                
+                // Override plugins with realistic data
                 Object.defineProperty(navigator, 'plugins', {
-                    get: () => [1, 2, 3, 4, 5],
+                    get: () => [
+                        {name: 'Chrome PDF Plugin', filename: 'internal-pdf-viewer'},
+                        {name: 'Chrome PDF Viewer', filename: 'mhjfbmdgcfjbbpaeojofohoefgiehjai'},
+                        {name: 'Native Client', filename: 'internal-nacl-plugin'}
+                    ],
                 });
                 
                 // Override languages
                 Object.defineProperty(navigator, 'languages', {
-                    get: () => ['en-US', 'en'],
+                    get: () => ['""" + selected_locale + """', 'en'],
                 });
                 
                 // Override platform
@@ -125,12 +163,12 @@ class LinkedInScraper:
                 
                 // Override hardware concurrency
                 Object.defineProperty(navigator, 'hardwareConcurrency', {
-                    get: () => 8,
+                    get: () => """ + str(random.randint(4, 16)) + """,
                 });
                 
                 // Override device memory
                 Object.defineProperty(navigator, 'deviceMemory', {
-                    get: () => 8,
+                    get: () => """ + str(random.choice([4, 8, 16, 32])) + """,
                 });
                 
                 // Override screen properties
@@ -153,9 +191,12 @@ class LinkedInScraper:
                     get: () => 24,
                 });
                 
-                // Override Chrome object
+                // Override Chrome object with realistic data
                 window.chrome = {
-                    runtime: {},
+                    runtime: {
+                        onConnect: undefined,
+                        onMessage: undefined
+                    },
                     loadTimes: function() {
                         return {
                             requestTime: Date.now() / 1000 - Math.random() * 1000,
@@ -201,6 +242,44 @@ class LinkedInScraper:
                         saveData: false
                     }),
                 });
+                
+                // Override timezone
+                Object.defineProperty(Intl.DateTimeFormat.prototype, 'resolvedOptions', {
+                    value: function() {
+                        return {
+                            locale: '""" + selected_locale + """',
+                            timeZone: 'America/New_York'
+                        };
+                    }
+                });
+                
+                // Override canvas fingerprinting
+                const getContext = HTMLCanvasElement.prototype.getContext;
+                HTMLCanvasElement.prototype.getContext = function(type) {
+                    if (type === '2d') {
+                        const context = getContext.call(this, type);
+                        const originalFillText = context.fillText;
+                        context.fillText = function() {
+                            const args = Array.prototype.slice.call(arguments);
+                            args[0] = args[0] + ' ';
+                            return originalFillText.apply(this, args);
+                        };
+                        return context;
+                    }
+                    return getContext.call(this, type);
+                };
+                
+                // Override WebGL fingerprinting
+                const getParameter = WebGLRenderingContext.prototype.getParameter;
+                WebGLRenderingContext.prototype.getParameter = function(parameter) {
+                    if (parameter === 37445) {
+                        return 'Intel Inc.';
+                    }
+                    if (parameter === 37446) {
+                        return 'Intel(R) Iris(TM) Graphics 6100';
+                    }
+                    return getParameter.call(this, parameter);
+                };
             """)
             
             print("Undetected Chrome driver setup completed successfully")
@@ -216,37 +295,165 @@ class LinkedInScraper:
         time.sleep(delay)
 
     def simulate_human_behavior(self):
-        """Simulate various human-like behaviors"""
+        """Simulate various human-like behaviors with advanced patterns"""
         try:
-            # Random mouse movements
-            self.driver.execute_script("""
-                // Simulate mouse movement
-                const event = new MouseEvent('mousemove', {
-                    'view': window,
-                    'bubbles': true,
-                    'cancelable': true,
-                    'clientX': Math.random() * window.innerWidth,
-                    'clientY': Math.random() * window.innerHeight
-                });
-                document.dispatchEvent(event);
-            """)
+            # Multiple random mouse movements with realistic patterns
+            for _ in range(random.randint(3, 7)):
+                self.driver.execute_script("""
+                    // Simulate realistic mouse movement with bezier curves
+                    const startX = Math.random() * window.innerWidth;
+                    const startY = Math.random() * window.innerHeight;
+                    const endX = Math.random() * window.innerWidth;
+                    const endY = Math.random() * window.innerHeight;
+                    
+                    // Simulate mouse move with intermediate points
+                    for (let i = 0; i <= 10; i++) {
+                        const t = i / 10;
+                        const x = startX + (endX - startX) * t + (Math.random() - 0.5) * 50;
+                        const y = startY + (endY - startY) * t + (Math.random() - 0.5) * 50;
+                        
+                        const event = new MouseEvent('mousemove', {
+                            'view': window,
+                            'bubbles': true,
+                            'cancelable': true,
+                            'clientX': x,
+                            'clientY': y
+                        });
+                        document.dispatchEvent(event);
+                    }
+                    
+                    // Simulate mouse hover
+                    const hoverEvent = new MouseEvent('mouseover', {
+                        'view': window,
+                        'bubbles': true,
+                        'cancelable': true,
+                        'clientX': endX,
+                        'clientY': endY
+                    });
+                    document.dispatchEvent(hoverEvent);
+                """)
+                time.sleep(random.uniform(0.1, 0.4))
             
-            # Random scroll
-            scroll_amount = random.randint(100, 500)
-            self.driver.execute_script(f"window.scrollTo(0, {scroll_amount});")
+            # Realistic scrolling behavior with acceleration
+            scroll_actions = random.randint(2, 5)
+            for _ in range(scroll_actions):
+                scroll_amount = random.randint(100, 500)
+                scroll_direction = random.choice([1, -1])
+                
+                # Simulate scroll with acceleration
+                for i in range(5):
+                    partial_scroll = scroll_amount // 5
+                    self.driver.execute_script(f"window.scrollBy(0, {partial_scroll * scroll_direction});")
+                    time.sleep(random.uniform(0.05, 0.15))
+                
+                time.sleep(random.uniform(0.3, 1.2))
             
-            # Random pause
-            time.sleep(random.uniform(0.5, 2))
+            # Simulate reading behavior with variable pauses
+            reading_time = random.uniform(2, 6)
+            time.sleep(reading_time)
+            
+            # Random page interactions
+            if random.random() < 0.4:  # 40% chance
+                self.driver.execute_script("""
+                    // Simulate focus events
+                    const focusEvent = new FocusEvent('focus', {
+                        'view': window,
+                        'bubbles': true,
+                        'cancelable': true
+                    });
+                    document.dispatchEvent(focusEvent);
+                    
+                    // Simulate click events
+                    const clickEvent = new MouseEvent('click', {
+                        'view': window,
+                        'bubbles': true,
+                        'cancelable': true,
+                        'clientX': Math.random() * window.innerWidth,
+                        'clientY': Math.random() * window.innerHeight
+                    });
+                    document.dispatchEvent(clickEvent);
+                """)
             
         except Exception as e:
             pass  # Ignore errors in simulation
 
+    def simulate_realistic_typing(self, element, text):
+        """Simulate realistic human typing patterns"""
+        try:
+            # Clear the element first
+            element.clear()
+            time.sleep(random.uniform(0.1, 0.3))
+            
+            # Type with realistic patterns
+            for i, char in enumerate(text):
+                element.send_keys(char)
+                
+                # Variable typing speed based on character type
+                if char in ".,!?;:":
+                    time.sleep(random.uniform(0.2, 0.6))  # Longer pause after punctuation
+                elif char == " ":
+                    time.sleep(random.uniform(0.1, 0.4))
+                elif char.isupper():
+                    time.sleep(random.uniform(0.15, 0.35))  # Slightly longer for capitals
+                else:
+                    time.sleep(random.uniform(0.05, 0.25))
+                
+                # Occasionally pause longer (like thinking)
+                if random.random() < 0.08:  # 8% chance
+                    time.sleep(random.uniform(0.8, 2.0))
+                
+                # Occasionally make typing mistakes
+                if random.random() < 0.04 and i > 3:  # 4% chance after 3 characters
+                    # Type wrong character
+                    wrong_char = random.choice("abcdefghijklmnopqrstuvwxyz")
+                    element.send_keys(wrong_char)
+                    time.sleep(random.uniform(0.1, 0.4))
+                    # Backspace and correct
+                    element.send_keys(Keys.BACKSPACE)
+                    time.sleep(random.uniform(0.1, 0.3))
+                    element.send_keys(char)
+                
+                # Occasionally pause between words
+                if char == " " and random.random() < 0.3:  # 30% chance
+                    time.sleep(random.uniform(0.2, 0.8))
+                    
+        except Exception as e:
+            # Fallback to simple typing
+            element.send_keys(text)
+
+    def visit_random_pages(self):
+        """Visit random pages to appear more human before searching"""
+        try:
+            random_pages = [
+                "https://www.google.com",
+                "https://www.google.com/search?q=weather",
+                "https://www.google.com/search?q=news",
+                "https://www.google.com/search?q=time",
+                "https://www.google.com/search?q=date"
+            ]
+            
+            # Visit 1-3 random pages
+            num_pages = random.randint(1, 3)
+            for _ in range(num_pages):
+                page = random.choice(random_pages)
+                print(f"Visiting random page: {page}")
+                self.driver.get(page)
+                self.human_like_delay(2, 5)
+                self.simulate_human_behavior()
+                
+        except Exception as e:
+            print(f"Error visiting random pages: {e}")
+
     def search_google_with_browser(self, query):
         """Search Google using browser automation with advanced human-like behavior"""
         try:
-            print("Opening Google in browser...")
+            print("Starting advanced human-like browsing session...")
             
-            # First, visit a random page to appear more human
+            # Visit random pages first to appear more human
+            self.visit_random_pages()
+            
+            # Now go to Google for the actual search
+            print("Opening Google for search...")
             self.driver.get("https://www.google.com")
             self.human_like_delay(3, 6)
             
@@ -261,27 +468,9 @@ class LinkedInScraper:
             search_box.click()
             self.human_like_delay(0.5, 1)
             
-            # Human-like typing with random delays and mistakes
-            print("Typing search query...")
-            search_box.clear()
-            self.human_like_delay(0.5, 1)
-            
-            # Type character by character with random delays and occasional pauses
-            for i, char in enumerate(query):
-                search_box.send_keys(char)
-                
-                # Random pause between characters
-                time.sleep(random.uniform(0.05, 0.25))
-                
-                # Occasionally pause longer (like thinking)
-                if random.random() < 0.1:  # 10% chance
-                    time.sleep(random.uniform(0.5, 1.5))
-                
-                # Occasionally backspace and retype (like making a mistake)
-                if random.random() < 0.05 and i > 5:  # 5% chance after 5 characters
-                    search_box.send_keys(Keys.BACKSPACE)
-                    time.sleep(random.uniform(0.1, 0.3))
-                    search_box.send_keys(char)
+            # Human-like typing with realistic patterns
+            print("Typing search query with realistic human behavior...")
+            self.simulate_realistic_typing(search_box, query)
             
             # Pause before pressing enter (like reviewing the query)
             self.human_like_delay(1, 3)

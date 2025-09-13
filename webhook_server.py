@@ -87,20 +87,24 @@ class LinkedInWebhookScraper:
             options.add_argument("--silent")
             options.add_argument("--log-level=3")
             
-            # Randomize user agent
+            # Randomize user agent with more realistic options
             user_agents = [
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
                 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
             ]
             selected_ua = random.choice(user_agents)
             options.add_argument(f"--user-agent={selected_ua}")
             
-            # Randomize language
-            options.add_argument(f"--lang={random.choice(['en-US', 'en-GB', 'en-CA', 'en-AU'])}")
+            # Randomize language and locale
+            locales = ['en-US', 'en-GB', 'en-CA', 'en-AU', 'en-NZ', 'en-ZA']
+            selected_locale = random.choice(locales)
+            options.add_argument(f"--lang={selected_locale}")
             
             # Create undetected Chrome driver with version detection
             self.driver = uc.Chrome(options=options, version_main=135)
@@ -218,6 +222,61 @@ class LinkedInWebhookScraper:
         delay = random.uniform(min_seconds, max_seconds)
         time.sleep(delay)
 
+    def simulate_human_behavior(self):
+        """Simulate various human-like behaviors"""
+        try:
+            # Multiple random mouse movements
+            for _ in range(random.randint(2, 5)):
+                self.driver.execute_script("""
+                    // Simulate realistic mouse movement
+                    const event = new MouseEvent('mousemove', {
+                        'view': window,
+                        'bubbles': true,
+                        'cancelable': true,
+                        'clientX': Math.random() * window.innerWidth,
+                        'clientY': Math.random() * window.innerHeight
+                    });
+                    document.dispatchEvent(event);
+                    
+                    // Simulate mouse hover
+                    const hoverEvent = new MouseEvent('mouseover', {
+                        'view': window,
+                        'bubbles': true,
+                        'cancelable': true,
+                        'clientX': Math.random() * window.innerWidth,
+                        'clientY': Math.random() * window.innerHeight
+                    });
+                    document.dispatchEvent(hoverEvent);
+                """)
+                time.sleep(random.uniform(0.1, 0.3))
+            
+            # Realistic scrolling behavior
+            scroll_actions = random.randint(1, 3)
+            for _ in range(scroll_actions):
+                scroll_amount = random.randint(50, 300)
+                scroll_direction = random.choice([1, -1])
+                self.driver.execute_script(f"window.scrollBy(0, {scroll_amount * scroll_direction});")
+                time.sleep(random.uniform(0.2, 0.8))
+            
+            # Simulate reading behavior (pause)
+            reading_time = random.uniform(1, 3)
+            time.sleep(reading_time)
+            
+            # Random page interaction
+            if random.random() < 0.3:  # 30% chance
+                self.driver.execute_script("""
+                    // Simulate focus events
+                    const focusEvent = new FocusEvent('focus', {
+                        'view': window,
+                        'bubbles': true,
+                        'cancelable': true
+                    });
+                    document.dispatchEvent(focusEvent);
+                """)
+            
+        except Exception as e:
+            pass  # Ignore errors in simulation
+
     def search_google_with_browser(self, query):
         """Search Google using browser automation with advanced human-like behavior"""
         try:
@@ -226,6 +285,9 @@ class LinkedInWebhookScraper:
             # First, visit a random page to appear more human
             self.driver.get("https://www.google.com")
             self.human_like_delay(3, 6)
+            
+            # Simulate human behavior before searching
+            self.simulate_human_behavior()
             
             # Wait for search box to be present
             wait = WebDriverWait(self.driver, 15)
@@ -267,6 +329,9 @@ class LinkedInWebhookScraper:
             logger.info("Waiting for search results to load...")
             self.human_like_delay(4, 8)
             
+            # Simulate human behavior while waiting
+            self.simulate_human_behavior()
+            
             # Check if we got search results or a challenge page
             page_title = self.driver.title
             logger.info(f"Page title: {page_title}")
@@ -304,6 +369,9 @@ class LinkedInWebhookScraper:
                             continue
                 except:
                     logger.warning("Could not find accept button, continuing...")
+            
+            # Simulate human browsing behavior
+            self.simulate_human_behavior()
             
             # Scroll down to see more results (human behavior)
             self.driver.execute_script("window.scrollTo(0, 600);")
