@@ -1,0 +1,4 @@
+requests>=2.25.0
+beautifulsoup4>=4.9.0
+undetected-chromedriver>=3.5.0
+flask>=2.3.0
