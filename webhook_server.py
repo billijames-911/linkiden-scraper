@@ -427,8 +427,60 @@ class LinkedInWebhookScraper:
         logger.info(f"Total LinkedIn profiles found: {len(linkedin_profiles)}")
         return linkedin_profiles
     
+    def scrape_linkedin_profiles_fallback(self, search_query):
+        """Fallback method using requests with different approach"""
+        try:
+            logger.info("Trying fallback method with requests...")
+            
+            # Use different search engines or approaches
+            search_urls = [
+                f"https://www.google.com/search?q={urllib.parse.quote(search_query)}",
+                f"https://www.bing.com/search?q={urllib.parse.quote(search_query)}",
+                f"https://duckduckgo.com/?q={urllib.parse.quote(search_query)}"
+            ]
+            
+            for search_url in search_urls:
+                try:
+                    logger.info(f"Trying search URL: {search_url}")
+                    
+                    # Use different headers for each attempt
+                    headers = {
+                        'User-Agent': random.choice([
+                            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                        ]),
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                        'Accept-Language': 'en-US,en;q=0.5',
+                        'Accept-Encoding': 'gzip, deflate',
+                        'Connection': 'keep-alive',
+                        'Upgrade-Insecure-Requests': '1',
+                    }
+                    
+                    response = self.session.get(search_url, headers=headers, timeout=30)
+                    
+                    if response.status_code == 200:
+                        logger.info(f"Successfully got response from {search_url}")
+                        linkedin_profiles = self.extract_linkedin_profiles(response.text)
+                        if linkedin_profiles:
+                            logger.info(f"Fallback method found {len(linkedin_profiles)} profiles")
+                            return linkedin_profiles
+                    
+                    time.sleep(random.uniform(2, 5))  # Random delay between attempts
+                    
+                except Exception as e:
+                    logger.warning(f"Fallback attempt failed for {search_url}: {e}")
+                    continue
+            
+            logger.error("All fallback methods failed")
+            return None
+            
+        except Exception as e:
+            logger.error(f"Error in fallback method: {e}")
+            return None
+
     def scrape_linkedin_profiles(self, search_query):
-        """Main method to scrape LinkedIn profiles using browser automation"""
+        """Main method to scrape LinkedIn profiles using browser automation with fallback"""
         logger.info(f"Starting LinkedIn profile search for: {search_query}")
         
         # Setup browser if not already done
@@ -442,17 +494,23 @@ class LinkedInWebhookScraper:
             # Search Google using browser
             html_content = self.search_google_with_browser(search_query)
             if not html_content:
-                logger.error("Failed to search Google with browser")
-                return None
+                logger.error("Failed to search Google with browser, trying fallback...")
+                return self.scrape_linkedin_profiles_fallback(search_query)
             
             # Extract LinkedIn profiles with metadata
             linkedin_profiles = self.extract_linkedin_profiles(html_content)
+            
+            # If no profiles found, try fallback
+            if not linkedin_profiles:
+                logger.warning("No profiles found with browser method, trying fallback...")
+                return self.scrape_linkedin_profiles_fallback(search_query)
             
             return linkedin_profiles
             
         except Exception as e:
             logger.error(f"Error in scrape_linkedin_profiles: {e}")
-            return None
+            logger.info("Trying fallback method...")
+            return self.scrape_linkedin_profiles_fallback(search_query)
     
     def close_browser(self):
         """Close the browser"""
@@ -542,6 +600,32 @@ def health_check():
         'timestamp': datetime.now().isoformat()
     }), 200
 
+@app.route('/test', methods=['GET'])
+def test_endpoint():
+    """Test endpoint to check if the service is working"""
+    try:
+        # Test basic functionality
+        test_query = '"APM - Australian Property Management" site:linkedin.com/in'
+        logger.info("Running test search...")
+        
+        # Try to get a simple response
+        results = scraper.scrape_linkedin_profiles(test_query)
+        
+        return jsonify({
+            'status': 'test_completed',
+            'query': test_query,
+            'results_found': len(results) if results else 0,
+            'timestamp': datetime.now().isoformat()
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Test failed: {e}")
+        return jsonify({
+            'status': 'test_failed',
+            'error': str(e),
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
 @app.route('/', methods=['GET'])
 def root():
     """Root endpoint with API documentation"""
@@ -550,6 +634,7 @@ def root():
         'endpoints': {
             'POST /webhook/linkedin-search': 'Search for LinkedIn profiles',
             'GET /health': 'Health check',
+            'GET /test': 'Test endpoint to verify functionality',
             'GET /': 'This documentation'
         },
         'example_request': {
