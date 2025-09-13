@@ -16,6 +16,7 @@ import logging
 from datetime import datetime
 import threading
 import queue
+import os
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -33,9 +34,9 @@ class LinkedInWebhookScraper:
         self.driver_lock = threading.Lock()
         
     def setup_browser(self):
-        """Setup undetected Chrome browser"""
+        """Setup undetected Chrome browser in headless mode for Render"""
         try:
-            logger.info("Setting up undetected Chrome driver...")
+            logger.info("Setting up undetected Chrome driver in headless mode...")
             
             # Randomize window size
             window_sizes = [
@@ -53,15 +54,17 @@ class LinkedInWebhookScraper:
             options.add_argument("--disable-gpu")
             options.add_argument(f"--window-size={width},{height}")
             options.add_argument("--start-maximized")
-            options.add_argument("--headless")  # Run in headless mode for server
+            
+            # HEADLESS MODE - Essential for Render
+            options.add_argument("--headless")
+            options.add_argument("--disable-web-security")
+            options.add_argument("--disable-features=VizDisplayCompositor")
             
             # Additional stealth options
             options.add_argument("--disable-blink-features=AutomationControlled")
             options.add_argument("--disable-extensions")
             options.add_argument("--disable-plugins")
-            options.add_argument("--disable-web-security")
             options.add_argument("--allow-running-insecure-content")
-            options.add_argument("--disable-features=VizDisplayCompositor")
             options.add_argument("--disable-background-timer-throttling")
             options.add_argument("--disable-backgrounding-occluded-windows")
             options.add_argument("--disable-renderer-backgrounding")
@@ -204,7 +207,7 @@ class LinkedInWebhookScraper:
                 });
             """)
             
-            logger.info("Undetected Chrome driver setup completed successfully")
+            logger.info("Undetected Chrome driver setup completed successfully in headless mode")
             return True
         except Exception as e:
             logger.error(f"Error setting up undetected Chrome driver: {e}")
@@ -557,12 +560,15 @@ def root():
     }), 200
 
 if __name__ == '__main__':
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    
     logger.info("Starting LinkedIn Profile Search Webhook Server...")
-    logger.info("Server will be available at: http://localhost:5000")
-    logger.info("Webhook endpoint: http://localhost:5000/webhook/linkedin-search")
+    logger.info(f"Server will be available at: http://0.0.0.0:{port}")
+    logger.info(f"Webhook endpoint: http://0.0.0.0:{port}/webhook/linkedin-search")
     
     try:
-        app.run(host='0.0.0.0', port=5000, debug=False, threaded=True)
+        app.run(host='0.0.0.0', port=port, debug=False, threaded=True)
     except KeyboardInterrupt:
         logger.info("Shutting down server...")
     finally:
